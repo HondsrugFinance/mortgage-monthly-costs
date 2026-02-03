@@ -89,7 +89,10 @@ class MortgageCalculator:
         )
         interest_deduction_monthly = _round_currency(interest_deduction_annual / 12)
 
-        # 7. Calculate Hillen
+        # 7. Calculate marginal rate (needed for EWF and Hillen)
+        marginal_rate = self._calculate_combined_marginal_rate(partner_info)
+
+        # 8. Calculate Hillen
         hillen_applicable = False
         hillen_deduction_annual = Decimal("0")
         hillen_benefit_monthly = Decimal("0")
@@ -99,17 +102,16 @@ class MortgageCalculator:
                 ewf_annual, totals["interest_box1_annual"], self.rules.hillen
             )
             hillen_applicable = hillen_deduction_annual > 0
-            # Hillen benefit is the tax saved on the Hillen deduction
+            # Hillen benefit is the tax saved on the Hillen deduction at marginal rate
             hillen_benefit_monthly = _round_currency(
-                hillen_deduction_annual * effective_rate / 12
+                hillen_deduction_annual * marginal_rate / 12
             )
 
-        # 8. Calculate net EWF addition
+        # 9. Calculate net EWF addition (taxed at marginal rate, not effective rate)
         net_ewf_addition_annual = ewf_annual - hillen_deduction_annual
-        ewf_tax_monthly = _round_currency(net_ewf_addition_annual * effective_rate / 12)
+        ewf_tax_monthly = _round_currency(net_ewf_addition_annual * marginal_rate / 12)
 
-        # 9. Build tax breakdown
-        marginal_rate = self._calculate_combined_marginal_rate(partner_info)
+        # 10. Build tax breakdown
 
         tax_breakdown = TaxBreakdown(
             ewf_annual=ewf_annual,
@@ -132,14 +134,14 @@ class MortgageCalculator:
             - ewf_tax_monthly,
         )
 
-        # 10. Build partner results if applicable
+        # 11. Build partner results if applicable
         partner_results = None
         if len(request.partners) > 1:
             partner_results = self._build_partner_results(
                 request, partner_info, distribution, ewf_annual
             )
 
-        # 11. Calculate net monthly cost
+        # 12. Calculate net monthly cost
         net_monthly = (
             totals["gross_monthly"]
             - interest_deduction_monthly
