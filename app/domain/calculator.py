@@ -113,6 +113,9 @@ class MortgageCalculator:
 
         # 10. Build tax breakdown
 
+        # Note: hillen_benefit is already reflected in the reduced ewf_tax
+        # So we should NOT add hillen_benefit separately to net_tax_effect
+        # The hillen_benefit field is kept for transparency/display purposes only
         tax_breakdown = TaxBreakdown(
             ewf_annual=ewf_annual,
             ewf_monthly=ewf_monthly,
@@ -127,11 +130,9 @@ class MortgageCalculator:
             hillen_benefit_monthly=hillen_benefit_monthly,
             net_ewf_addition_annual=net_ewf_addition_annual,
             ewf_tax_monthly=ewf_tax_monthly,
-            total_tax_benefit_monthly=interest_deduction_monthly + hillen_benefit_monthly,
+            total_tax_benefit_monthly=interest_deduction_monthly,
             total_tax_cost_monthly=ewf_tax_monthly,
-            net_tax_effect_monthly=interest_deduction_monthly
-            + hillen_benefit_monthly
-            - ewf_tax_monthly,
+            net_tax_effect_monthly=interest_deduction_monthly - ewf_tax_monthly,
         )
 
         # 11. Build partner results if applicable
@@ -142,10 +143,11 @@ class MortgageCalculator:
             )
 
         # 12. Calculate net monthly cost
+        # Note: hillen_benefit is already reflected in the reduced ewf_tax
+        # So we should NOT subtract hillen_benefit separately
         net_monthly = (
             totals["gross_monthly"]
             - interest_deduction_monthly
-            - hillen_benefit_monthly
             + ewf_tax_monthly
         )
 
