@@ -295,8 +295,11 @@ function displayResults(apiResponse) {
     // Netto maandlasten
     nettoMaandlasten: apiResponse.net_monthly_cost,
 
-    // Totale renteaftrek per maand (één bedrag)
-    renteaftrekPerMaand: apiResponse.tax_breakdown.interest_deduction_monthly,
+    // Netto belastingvoordeel per maand (renteaftrek − EWF bijtelling)
+    nettoRenteaftrek: apiResponse.tax_breakdown.net_tax_effect_monthly,
+
+    // Bruto renteaftrek (alleen het rentevoordeel, exclusief EWF)
+    brutoRenteaftrek: apiResponse.tax_breakdown.interest_deduction_monthly,
 
     // EWF bijtelling
     ewfBijtellingPerMaand: apiResponse.tax_breakdown.ewf_tax_monthly,
@@ -336,7 +339,8 @@ function displayResults(apiResponse) {
 |--------------|--------------|
 | total_gross_monthly | Bruto maandlasten |
 | net_monthly_cost | Netto maandlasten |
-| tax_breakdown.interest_deduction_monthly | Renteaftrek (totaal) |
+| tax_breakdown.net_tax_effect_monthly | Netto belastingvoordeel (renteaftrek − EWF) |
+| tax_breakdown.interest_deduction_monthly | Bruto renteaftrek (alleen rentevoordeel) |
 | tax_breakdown.ewf_tax_monthly | EWF bijtelling |
 | tax_breakdown.hillen_benefit_monthly | Hillen voordeel |
 
